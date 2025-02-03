@@ -9,7 +9,7 @@ import sqlite3
 import datetime
 
 # Set OpenAI API key
-openai.api_key = "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"
+openai.api_key = "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"
 
 #GPTapi = os.getenv("GPT_API_TOKEN")
 #model = genai.GenerativeModel("gemini-1.5-flash")
@@ -52,8 +52,7 @@ def cashback_reply():
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
-    
-    response_text = r["choices"][0]["message"]["content"]#.split(".")[0] + ". " + r2["choices"][0]["message"]["content"]
+    response_text = r["choices"][0]["message"]["content"]
     # Ensure proper formatting for headers (converting ### to <h3> with a line break)
     response_text = response_text.replace("### ", "<h3>").replace("\n", "</h3>\n")
 
@@ -82,8 +81,7 @@ def miles_reply():
         model="gpt-4o-mini",
         messages=[{"role": "user", "content": prompt}]
     )
-    
-    response_text = r["choices"][0]["message"]["content"]#.split(".")[0] + ". " # + r2["choices"][0]["message"]["content"]
+    response_text = r["choices"][0]["message"]["content"]
     # Ensure proper formatting for headers (converting ### to <h3> with a line break)
     response_text = response_text.replace("### ", "<h3>").replace("\n", "</h3>\n")
 
@@ -127,6 +125,33 @@ def delete_db():
     c.close()
     conn.close()
     return(render_template("delete_db.html"))
+
+@app.route("/faq",methods=["GET","POST"])
+def faq():
+    return(render_template("faq.html"))
+
+@app.route("/faq_reply",methods=["GET","POST"]) 
+def faq_reply():
+    q = request.form.get("q")
+    r = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": q}]
+    )
+
+    response_text = r["choices"][0]["message"]["content"]
+    # Ensure proper formatting for headers (converting ### to <h3> with a line break)
+    response_text = response_text.replace("### ", "<h3>").replace("\n", "</h3>\n")
+
+    # Bold formatting using <b> tags
+    response_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", response_text)
+
+    # List formatting (turning "- " into <ul><li> items)
+    response_text = response_text.replace("\n- ", "<ul><li>").replace("\n", "</li></ul>\n")
+
+    # Convert paragraphs into <p> tags for proper separation
+    response_text = "<p>" + response_text.replace("\n", "</p><p>") + "</p>"
+
+    return render_template("gpt_reply.html", r=response_text)
 
 if __name__ == "__main__":
     app.run()
