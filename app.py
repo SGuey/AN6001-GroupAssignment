@@ -11,10 +11,6 @@ import datetime
 # Set OpenAI API key
 #openai.api_key = "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"
 
-#GPTapi = os.getenv("GPT_API_TOKEN")
-#model = genai.GenerativeModel("gemini-1.5-flash")
-#genai.configure(api_key="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")
-
 app = Flask(__name__)
 user_name = ""
 flag = 1
