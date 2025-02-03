@@ -9,7 +9,7 @@ import sqlite3
 import datetime
 
 # Set OpenAI API key
-openai.api_key = "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"
+#openai.api_key = "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"
 
 #GPTapi = os.getenv("GPT_API_TOKEN")
 #model = genai.GenerativeModel("gemini-1.5-flash")
