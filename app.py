@@ -1,5 +1,6 @@
 
 from flask import Flask,render_template,request
+import re
 import openai
 import os
 import numpy as np
@@ -8,7 +9,7 @@ import sqlite3
 import datetime
 
 # Set OpenAI API key
-openai.api_key = "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"
+openai.api_key = "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"
 
 #GPTapi = os.getenv("GPT_API_TOKEN")
 #model = genai.GenerativeModel("gemini-1.5-flash")
@@ -39,6 +40,99 @@ def main():
         conn.close()
     return(render_template("main.html",r=user_name))
 
+@app.route("/gpt",methods=["GET","POST"])
+def gpt():
+    return(render_template("gpt.html"))
+
+@app.route("/cashback_reply",methods=["GET","POST"])
+def cashback_reply():
+    q = request.form.get("q")
+    prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and return suggested Singapore Cashback Credit card together with cashback % for {q}. Order the credit card suggestion by higest cashback rate. Dont need to return conclusion."
+    r = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    response_text = r["choices"][0]["message"]["content"]#.split(".")[0] + ". " + r2["choices"][0]["message"]["content"]
+    # Ensure proper formatting for headers (converting ### to <h3> with a line break)
+    response_text = response_text.replace("### ", "<h3>").replace("\n", "</h3>\n")
+
+    # Bold formatting using <b> tags
+    response_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", response_text)
+
+    # List formatting (turning "- " into <ul><li> items)
+    response_text = response_text.replace("\n- ", "<ul><li>").replace("\n", "</li></ul>\n")
+
+    # Convert paragraphs into <p> tags for proper separation
+    response_text = "<p>" + response_text.replace("\n", "</p><p>") + "</p>"
+
+    # Stop the response after the list section
+    # Find the index of the last </ul> tag (end of list) and truncate after it
+    #end_of_list = response_text.find("</ul>")
+    #if end_of_list != -1:
+    #    response_text = response_text[:end_of_list + len("</ul>")]
+
+    return render_template("gpt_reply.html", r=response_text)
+
+@app.route("/miles_reply",methods=["GET","POST"]) 
+def miles_reply():
+    q = request.form.get("q")
+    prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and return suggested Singapore Reward Miles Credit card together with the miles earn rate for {q}. Order the credit card suggestion by higest miles earn rate. Dont need to return conclusion."
+    r = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    response_text = r["choices"][0]["message"]["content"]#.split(".")[0] + ". " # + r2["choices"][0]["message"]["content"]
+    # Ensure proper formatting for headers (converting ### to <h3> with a line break)
+    response_text = response_text.replace("### ", "<h3>").replace("\n", "</h3>\n")
+
+    # Bold formatting using <b> tags
+    response_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", response_text)
+
+    # List formatting (turning "- " into <ul><li> items)
+    response_text = response_text.replace("\n- ", "<ul><li>").replace("\n", "</li></ul>\n")
+
+    # Convert paragraphs into <p> tags for proper separation
+    response_text = "<p>" + response_text.replace("\n", "</p><p>") + "</p>"
+
+    # Stop the response after the list section
+    # Find the index of the last </ul> tag (end of list) and truncate after it
+    #end_of_list = response_text.find("</ul>")
+    #if end_of_list != -1:
+    #    response_text = response_text[:end_of_list + len("</ul>")]
+
+    return render_template("gpt_reply.html", r=response_text)
+   
+    
+@app.route("/retrieve_db",methods=["GET","POST"])
+def retrieve_db():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''select * from user''')
+    r=""
+    for row in c:
+        print(row)
+        r = r + str(row)
+    c.close()
+    conn.close()
+    return(render_template("retrieve_db.html",r=r))
+
+@app.route("/delete_db",methods=["GET","POST"])
+def delete_db():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''DELETE FROM user''')
+    conn.commit()
+    c.close()
+    conn.close()
+    return(render_template("delete_db.html"))
+
+if __name__ == "__main__":
+    app.run()
+
+""" 
+### Commented ###
 @app.route("/prediction",methods=["GET","POST"])
 def prediction():
     return(render_template("prediction.html"))
@@ -76,51 +170,4 @@ def text_sentiment_result():
 
 @app.route("/transfer_money",methods=["GET","POST"])
 def transfer_money():
-    return(render_template("transfer_money.html"))
-
-@app.route("/makersuite",methods=["GET","POST"])
-def makersuite():
-    return(render_template("makersuite.html"))
-
-@app.route("/makersuite_1",methods=["GET","POST"])
-def makersuite_1():
-    q = "Can you help me prepare my tax return?"
-    r = model.generate_content(q)
-    return(render_template("makersuite_1_reply.html",r=r.text))
-
-@app.route("/makersuite_gen",methods=["GET","POST"])
-def makersuite_gen():
-    q = request.form.get("q")
-    prompt = f"Please return Singapore Credit card MCC Code for {q}"
-    r = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}]
-    )
-    response_text = r["choices"][0]["message"]["content"].split(".")[0] + "."
-    return render_template("makersuite_gen_reply.html", r=response_text)
-
-@app.route("/retrieve_db",methods=["GET","POST"])
-def retrieve_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''select * from user''')
-    r=""
-    for row in c:
-        print(row)
-        r = r + str(row)
-    c.close()
-    conn.close()
-    return(render_template("retrieve_db.html",r=r))
-
-@app.route("/delete_db",methods=["GET","POST"])
-def delete_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''DELETE FROM user''')
-    conn.commit()
-    c.close()
-    conn.close()
-    return(render_template("delete_db.html"))
-
-if __name__ == "__main__":
-    app.run()
+    return(render_template("transfer_money.html")) """

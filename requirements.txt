@@ -1,0 +1,6 @@
+gunicorn
+flask
+numpy
+textblob
+openai==0.28
+re
