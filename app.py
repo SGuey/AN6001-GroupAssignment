@@ -9,7 +9,7 @@ import sqlite3
 from datetime import datetime
 
 # Set OpenAI API key
-#openai.api_key = "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"
+openai.api_key = "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"
 
 app = Flask(__name__)
 user_name = ""
@@ -62,10 +62,172 @@ def main():
 @app.route("/gpt",methods=["GET","POST"])
 def gpt():
     return(render_template("gpt.html"))
+  
+@app.route("/retrieve_userlog",methods=["GET","POST"])
+def retrieve_db():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''SELECT * FROM user WHERE name = ?''', (user_name,))
+    r = c.fetchall()  # Fetch all rows as a list of tuples
+    c.close()
+    conn.close()
+    return(render_template("retrieve_db.html",r=r))
 
+@app.route("/delete_userlog",methods=["GET","POST"])
+def delete_db():
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''DELETE FROM user WHERE name = ?''', (user_name,))
+    conn.commit()
+    c.close()
+    conn.close()
+    return(render_template("delete_db.html"))
+
+@app.route("/linkcc",methods=["GET","POST"])
+def linkcc():
+    message = ""
+    credit_card_added = ""
+
+    if request.method == "POST":
+        card_type = request.form.get('cardType')
+        bank_name = request.form.get('bank')
+        cc_name = request.form.get('creditCard')
+        
+        if card_type and bank_name and cc_name:
+            # Check if the credit card from this bank already exists for the user
+            conn = sqlite3.connect('database.db')
+            c = conn.cursor()
+            c.execute('''SELECT * FROM user_cc WHERE name = ? AND bank_cc = ? AND cc_name = ?''', (user_name, bank_name, cc_name))
+            existing_card = c.fetchone()
+            
+            if existing_card:
+                message = f"The credit card '{cc_name}' from {bank_name} has already been added."
+            else:
+                # Insert the data into the user_cc table
+                datestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                c.execute('''INSERT INTO user_cc (name, type_cc, bank_cc, cc_name, datestamp)
+                            VALUES (?, ?, ?, ?, ?)''', (user_name, card_type, bank_name, cc_name, datestamp))
+                conn.commit()
+                message = f"Credit card '{cc_name}' added! Do you want to proceed add another 1?"
+
+            # Fetch the updated list of credit cards for this user
+            user_cards = get_user_all_credit_cards(user_name)
+
+            conn.close()
+            return render_template('linkcc.html', user_name=user_name, message=message, user_cards=user_cards)
+
+    user_cards = get_user_all_credit_cards(user_name)
+    
+
+    return render_template('linkcc.html', user_name=user_name, user_cards=user_cards)
+
+def generate_gpt_response(prompt):
+    # Request the GPT model for a response
+    r = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    
+    # Extract the response content
+    response_text = r["choices"][0]["message"]["content"]
+
+    # Formatting the response text
+    response_text = response_text.replace("### ", "<h3>").replace("\n", "</h3>\n")
+    response_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", response_text)
+    response_text = response_text.replace("\n- ", "<ul><li>").replace("\n", "</li></ul>\n")
+    response_text = "<p>" + response_text.replace("\n", "</p><p>") + "</p>"
+    
+    return response_text
+
+@app.route("/faq",methods=["GET","POST"])
+def faq():
+    return(render_template("faq.html"))
+
+@app.route("/faq_reply",methods=["GET","POST"]) 
+def faq_reply():
+    q = request.form.get("q")
+    response_text = generate_gpt_response(q)
+
+    return render_template("faq_reply.html", r=response_text)
+
+def get_user_credit_cards(user_name,type):
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''SELECT cc_name FROM user_cc WHERE name = ? and type_cc = ?''', (user_name,type))
+    r = c.fetchall()  # Fetch all rows as a list of tuples
+    c.close()
+    conn.close()
+    return(r)
+
+def get_user_all_credit_cards(user_name):
+    # If GET request, fetch user's existing credit cards
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''SELECT bank_cc, cc_name, datestamp FROM user_cc WHERE name = ? ORDER BY bank_cc,cc_name''', (user_name,))
+    user_cards = c.fetchall()
+    conn.close()
+    return(user_cards)
+
+def get_user_all_credit_cards_With_types(user_name,types):
+    # If GET request, fetch user's existing credit cards
+    conn = sqlite3.connect('database.db')
+    c = conn.cursor()
+    c.execute('''SELECT bank_cc, cc_name, datestamp FROM user_cc WHERE name = ? and type_cc = ? ORDER BY bank_cc,cc_name''', (user_name,types))
+    user_cards = c.fetchall()
+    conn.close()
+    return(user_cards)
+
+
+@app.route("/cashback_reply", methods=["GET", "POST"])
+def cashback_reply():
+    q = request.form.get("q")  # The Merchant Name input
+    use_user_cc = 'optIn' in request.form  # Checks if the checkbox was checked
+    user_cc = None
+
+    if use_user_cc:
+        user_cc = get_user_credit_cards(user_name,'Cashback')  # Fetch user's credit cards from DB
+        
+    # Building the prompt based on whether the user opted in to use their credit cards
+    if user_cc:
+        prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and Use the following credit cards for the suggestion: {user_cc}. Show the cashback %. Don't need to return a conclusion."
+    else:
+        prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and return suggested Singapore Cashback Credit card with cashback % for {q}. Order the credit card suggestions by highest cashback rate. Don't need to return a conclusion."
+
+    response_text = generate_gpt_response(prompt)
+    user_cards = get_user_all_credit_cards_With_types(user_name,'Cashback')
+
+    return render_template("gpt_reply.html", r=response_text, user_cards=user_cards, type ='Cashback')
+
+@app.route("/miles_reply", methods=["GET", "POST"])
+def miles_reply():
+    q = request.form.get("q")  # The Merchant Name input
+    use_user_cc = 'optIn' in request.form  # Checks if the checkbox was checked
+    user_cc = None
+
+    if use_user_cc:
+        user_cc = get_user_credit_cards(user_name,'Miles')  # Fetch user's credit cards from DB
+
+    # Building the prompt based on whether the user opted in to use their credit cards
+    if user_cc:
+        prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and Use the following credit cards for the suggestion: {user_cc} and suggest miles earn rate for {q}. Order the credit card suggestions by highest miles earn rate. Don't need to return a conclusion."
+    else:
+        prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and return suggested Singapore Reward Miles Credit card with miles earn rate for {q}. Order the credit card suggestions by highest miles earn rate. Don't need to return a conclusion."
+
+    response_text = generate_gpt_response(prompt)
+    user_cards = get_user_all_credit_cards_With_types(user_name,'Miles')
+    return render_template("gpt_reply.html", r=response_text, user_cards=user_cards, type = 'Miles')
+
+if __name__ == "__main__":
+    init_db()
+    app.run()
+
+""" 
+### Commented ###
 @app.route("/cashback_reply",methods=["GET","POST"])
 def cashback_reply():
-    q = request.form.get("q")
+    q = request.form.get("q") # The Merchant Name input
+    use_user_cc = 'optIn' in request.form  # Checks if the checkbox was checked
+    
     prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and return suggested Singapore Cashback Credit card together with cashback % for {q}. Order the credit card suggestion by higest cashback rate. Dont need to return conclusion."
     r = openai.ChatCompletion.create(
         model="gpt-4o-mini",
@@ -120,139 +282,5 @@ def miles_reply():
     #    response_text = response_text[:end_of_list + len("</ul>")]
 
     return render_template("gpt_reply.html", r=response_text)
-   
     
-@app.route("/retrieve_userlog",methods=["GET","POST"])
-def retrieve_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''SELECT * FROM user WHERE name = ?''', (user_name,))
-    r = c.fetchall()  # Fetch all rows as a list of tuples
-    c.close()
-    conn.close()
-    return(render_template("retrieve_db.html",r=r))
-
-@app.route("/delete_userlog",methods=["GET","POST"])
-def delete_db():
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''DELETE FROM user WHERE name = ?''', (user_name,))
-    conn.commit()
-    c.close()
-    conn.close()
-    return(render_template("delete_db.html"))
-
-@app.route("/linkcc",methods=["GET","POST"])
-def linkcc():
-    message = ""
-    credit_card_added = ""
-
-    if request.method == "POST":
-        card_type = request.form.get('cardType')
-        bank_name = request.form.get('bank')
-        cc_name = request.form.get('creditCard')
-        
-        if card_type and bank_name and cc_name:
-            # Check if the credit card from this bank already exists for the user
-            conn = sqlite3.connect('database.db')
-            c = conn.cursor()
-            c.execute('''SELECT * FROM user_cc WHERE name = ? AND bank_cc = ? AND cc_name = ?''', (user_name, bank_name, cc_name))
-            existing_card = c.fetchone()
-            
-            if existing_card:
-                message = f"The credit card '{cc_name}' from {bank_name} has already been added."
-            else:
-                # Insert the data into the user_cc table
-                datestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                c.execute('''INSERT INTO user_cc (name, type_cc, bank_cc, cc_name, datestamp)
-                            VALUES (?, ?, ?, ?, ?)''', (user_name, card_type, bank_name, cc_name, datestamp))
-                conn.commit()
-                message = f"Credit card '{cc_name}' added! Do you want to proceed add another 1?"
-
-            # Fetch the updated list of credit cards for this user
-            c.execute('''SELECT bank_cc, cc_name, datestamp FROM user_cc WHERE name = ? ORDER BY bank_cc,cc_name ''', (user_name,))
-            user_cards = c.fetchall()
-
-            conn.close()
-            return render_template('linkcc.html', user_name=user_name, message=message, user_cards=user_cards)
-
-    # If GET request, fetch user's existing credit cards
-    conn = sqlite3.connect('database.db')
-    c = conn.cursor()
-    c.execute('''SELECT bank_cc, cc_name, datestamp FROM user_cc WHERE name = ? ORDER BY datestamp DESC''', (user_name,))
-    user_cards = c.fetchall()
-    conn.close()
-
-    return render_template('linkcc.html', user_name=user_name, user_cards=user_cards)
-
-@app.route("/faq",methods=["GET","POST"])
-def faq():
-    return(render_template("faq.html"))
-
-@app.route("/faq_reply",methods=["GET","POST"]) 
-def faq_reply():
-    q = request.form.get("q")
-    r = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": q}]
-    )
-
-    response_text = r["choices"][0]["message"]["content"]
-    # Ensure proper formatting for headers (converting ### to <h3> with a line break)
-    response_text = response_text.replace("### ", "<h3>").replace("\n", "</h3>\n")
-
-    # Bold formatting using <b> tags
-    response_text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", response_text)
-
-    # List formatting (turning "- " into <ul><li> items)
-    response_text = response_text.replace("\n- ", "<ul><li>").replace("\n", "</li></ul>\n")
-
-    # Convert paragraphs into <p> tags for proper separation
-    response_text = "<p>" + response_text.replace("\n", "</p><p>") + "</p>"
-
-    return render_template("gpt_reply.html", r=response_text)
-
-if __name__ == "__main__":
-    init_db()
-    app.run()
-
-""" 
-### Commented ###
-@app.route("/prediction",methods=["GET","POST"])
-def prediction():
-    return(render_template("prediction.html"))
-
-@app.route("/DBS",methods=["GET","POST"])
-def DBS():
-    return(render_template("DBS.html"))
-
-@app.route("/DBS_prediction",methods=["GET","POST"])
-def DBS_prediction():
-    q = float(request.form.get("q"))
-    return(render_template("DBS_prediction.html",r=90.2 + (-50.6*q)))
-
-@app.route("/creditability",methods=["GET","POST"])
-def creditability():
-    return(render_template("creditability.html"))
-
-@app.route("/creditability_prediction",methods=["GET","POST"])
-def creditability_prediction():
-    q = float(request.form.get("q"))
-    r=1.22937616 + (-0.00011189*q)
-    r = np.where(r >= 0.5, "yes","no")
-    r = str(r)
-    return(render_template("creditability_prediction.html",r=r))
-
-@app.route("/text_sentiment",methods=["GET","POST"])
-def text_sentiment():
-    return(render_template("text_sentiment.html"))
-
-@app.route("/text_sentiment_result",methods=["GET","POST"])
-def text_sentiment_result():
-    q = request.form.get("q")
-    r = textblob.TextBlob(q).sentiment
-    return(render_template("text_sentiment_result.html",r=r))
-
-@app.route("/transfer_money",methods=["GET","POST"])
-def transfer_money():
-    return(render_template("transfer_money.html")) """
+    """

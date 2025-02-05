@@ -18,6 +18,29 @@
             text-align: center;
         }
 
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        input[type="submit"] {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -25,9 +48,52 @@
             background-color: white;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            text-align: center; /* Center content */
+            text-align: center;
         }
 
+        pre {
+            white-space: pre-wrap; /* Wrap long lines */
+            word-wrap: break-word; /* Break long words */
+            overflow-wrap: break-word; /* Ensure long words break */
+            word-break: break-word; /* Prevent overflow */
+            max-width: 100%; /* Ensure it fits within the container */
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 10px;
+            }
+
+            input[type="submit"] {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+        
+        .card-table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            border: 1px solid #ccc;
+        }
+        .card-table th, .card-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .card-table th {
+            background-color: #007BFF;
+            color: white;
+        }
+        .card-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .card-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
         button {
             background-color: #007BFF;
             color: white;
@@ -36,47 +102,18 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            margin-top: 10px; /* Uniform spacing */
-            display: inline-block; /* Keep buttons in line */
+            margin-top: 20px;
+            display: inline-block
         }
-
         button:hover {
             background-color: #0056b3;
-        }
-
-        .card-table {
-            width: 100%;
-            margin-top: 30px;
-            border-collapse: collapse;
-            border: 1px solid #ccc;
-        }
-
-        .card-table th, .card-table td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-
-        .card-table th {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        .card-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .card-table tr:hover {
-            background-color: #f1f1f1;
-        }
+        }  
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Reply:</h2>
         <div>{{ r|safe }}</div>
-
-        <!-- Buttons Container (Ensuring they are centered and aligned) -->
         <div>
             <form action="/main" method="post" style="display: inline;">
                 <button type="submit">Return</button>
@@ -86,26 +123,5 @@
             </form>
         </div>
     </div>
-
-    <!-- Table of User's Existing Cards -->
-    <h2>Existing {{type}} Credit Cards</h2>
-    <table class="card-table">
-        <thead>
-            <tr>
-                <th>Bank</th>
-                <th>Credit Card</th>
-                <th>Date Added</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for card in user_cards %}
-            <tr>
-               <td>{{ card[0] }}</td>
-               <td>{{ card[1] }}</td>
-               <td>{{ card[2] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
 </body>
 </html>

@@ -18,11 +18,38 @@
             text-align: center;
         }
 
-        form {
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .section {
+            margin-bottom: 150px;
+            width: 30%; /* Each section will take up about half the container width */
+        }
+
+        .section h3 {
+            text-align: center;
+            color: #007BFF; /* Blue for section titles */
+        }
+
+        .button-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin: 20px;
+            width: 250px; /* Set fixed width */
+            height: 50px; /* Set fixed height */
+            overflow-wrap: break-word; /* Allows text to wrap within the container */
+            word-wrap: break-word; /* Ensures text wraps if it overflows */
+            text-align: center; /* Ensures text is centered */
+
         }
 
         input[type="submit"] {
@@ -35,61 +62,91 @@
             color: white;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            width: 250px; /* Same width for all buttons */
         }
 
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
 
+        /* For smaller screens */
         @media (max-width: 600px) {
             .container {
                 margin: 10px;
                 padding: 10px;
             }
 
+            .section {
+                width: 100%; /* Full width for sections on small screens */
+            }
+
             input[type="submit"] {
-                width: 100%;
+                width: 100%; /* Full-width for buttons on small screens */
                 margin: 5px 0;
             }
+        }
+
+        /* Centering the "End" button */
+        .end-button-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
+    <h2>Hi, {{r}}, how can I help you today?</h2>
+
     <div class="container">
         <br>
-        <h2>Hi, {{r}}, how can I help you today?</h2>
-        <form action="/gpt" method="post">
-            <input type="submit" value="MCC Code Checker">
-        </form>
-        <form action="/faq" method="post">
-            <input type="submit" value="FAQ & Customer Support">
-        </form>
-        <form action="/main" method="post">
-            <input type="submit" value="Credit Card Suggestion Based on Income">
-        </form>
-        <form action="/main" method="post">
-            <input type="submit" value="Credit Card Approval Predictor">
-        </form>
-        <form action="/linkcc" method="post">
-            <input type="submit" value="Link Credit Cards">
-        </form>
-        <form action="/retrieve_userlog" method="post">
-            <input type="submit" value="View Users Login Logs">
-        </form>
-        <form action="/delete_userlog" method="post">
-            <input type="submit" value="Clear Users Login Logs">
-        </form>
-        <form action="/" method="post">
-            <input type="submit" value="End">
-        </form>
+        <!-- Credit Cards Checker and Credit Cards Suggestion Sections Side by Side -->
+        <div class="section">
+            <h3>Credit Cards Checker</h3>
+            <div class="button-container">
+                <form action="/gpt" method="post">
+                    <input type="submit" value="MCC Code Checker">
+                </form>
+                <form action="/faq" method="post">
+                    <input type="submit" value="FAQ & Customer Support">
+                </form>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Credit Cards Suggestion</h3>
+            <div class="button-container">
+                <form action="/main" method="post">
+                    <input type="submit" value="Credit Card Suggestion Based on Income">
+                </form>
+                <form action="/main" method="post">
+                    <input type="submit" value="Credit Card Approval Predictor">
+                </form>
+            </div>
+        </div>
+
+        <!-- User Info Maintenance Section Below -->
+        <div class="section">
+            <h3>User Info Maintenance</h3>
+            <div class="button-container">
+                <form action="/linkcc" method="post">
+                    <input type="submit" value="Link Credit Cards">
+                </form>
+                <form action="/retrieve_userlog" method="post">
+                    <input type="submit" value="View Users Login Logs">
+                </form>
+                <form action="/delete_userlog" method="post">
+                    <input type="submit" value="Clear Users Login Logs">
+                </form>
+            </div>
+        </div>
+
+        <!-- Centered "End" button -->
+        <div class="end-button-container">
+            <form action="/" method="post">
+                <input type="submit" value="End">
+            </form>
+        </div>
     </div>
 </body>
 </html>
