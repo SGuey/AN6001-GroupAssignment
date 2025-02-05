@@ -31,14 +31,14 @@
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
-            background-color: #4CAF50;
+            background-color: #007BFF;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
         input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
 
         .container {
@@ -77,7 +77,7 @@
         <h2>Reply:</h2>
         <div>{{ r|safe }}</div>
         <form action="/main" method="post">
-            <input type="submit" value="Main">
+            <input type="submit" value="Return">
         </form>
         <form action="/" method="post">
             <input type="submit" value="End">

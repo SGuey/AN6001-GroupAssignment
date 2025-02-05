@@ -5,98 +5,108 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCC Code Portal</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+    }
 
-        h2 {
-            color: #555;
-            text-align: center;
-        }
+    h2 {
+        color: #555;
+        text-align: center;
+    }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px;
-        }
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+    }
 
-        input[type="text"], input[type="submit"] {
-            padding: 10px;
-            margin: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
+    input[type="text"] {
+        padding: 10px 20px;
+        margin: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        background-color: white;  /* Keep Merchant Name field white */
+        width: 200px;  /* Set width for consistency */
+    }
 
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    input[type="button"], input[type="submit"], .enter-button {
+        padding: 10px 20px;  /* Adjust padding for uniform button size */
+        margin: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        background-color: #007BFF;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        width: 200px; /* Set fixed width for all buttons */
+        text-align: center; /* Ensures text is centered */
+    }
 
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
+    input[type="submit"]:hover, input[type="button"]:hover, .enter-button:hover {
+        background-color: #0056b3;
+    }
 
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
+
+    @media (max-width: 600px) {
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            margin: 10px;
+            padding: 10px;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                margin: 10px;
-                padding: 10px;
-            }
-
-            input[type="text"], input[type="submit"] {
-                width: 100%;
-                margin: 5px 0;
-            }
+        input[type="text"], input[type="submit"], input[type="button"], .enter-button {
+            width: 100%; /* Makes buttons full width on small screens */
+            margin: 5px 0;
         }
+    }
 
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px; /* Space between buttons */
-            margin-top: 20px;
-        }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px; /* Space between buttons */
+        margin-top: 20px;
+        align-items: center;  /* Centering buttons horizontally */
+    }
 
-        button {
-            display: inline-block;
-        }
+    button {
+        display: inline-block;
+    }
 
-        .form-container {
-            display: flex;
-            justify-content: space-between; /* Aligns items to opposite sides */
-            align-items: center; /* Ensures vertical alignment */
-        }
+    .form-container {
+        display: flex;
+        justify-content: space-between; /* Aligns items to opposite sides */
+        align-items: center; /* Ensures vertical alignment */
+    }
 
-        .enter-button {
-            margin-left: 10px;
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            padding: 10px 20px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
+    .enter-button {
+        margin-left: 10px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        background-color: #007BFF;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
-        .enter-button:hover {
-            background-color: #45a049;
-        }
+    .enter-button:hover {
+        background-color: #0056b3;
+    }
     </style>
 </head>
 <body>
@@ -110,6 +120,14 @@
                 <label for="merchantName">Merchant Name:</label> <!-- Associates label with the input -->
                 <input type="text" id="merchantName" name="q" placeholder="Please type Merchant Name to query:" required>
             </div>
+
+            <!-- Checkbox for additional option -->
+            <div class="input-container">
+                <label>
+                    <input type="checkbox" name="optIn" value="1"> Use user own credit cards to search on results.
+                </label>
+            </div>
+
             <!-- Two buttons: Cashback and Miles -->
             <div class="button-container">
                 <input type="button" value="Cashback" onclick="setFormAction('/cashback_reply')" class="enter-button">
@@ -120,7 +138,7 @@
         <!-- Main and End buttons, placed side by side -->
         <div class="button-container">
             <form action="/main" method="post">
-                <input type="submit" value="Main">
+                <input type="submit" value="Return">
             </form>
             <form action="/" method="post">
                 <input type="submit" value="End">

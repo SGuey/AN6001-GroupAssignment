@@ -26,22 +26,25 @@
         }
 
         input[type="text"], input[type="submit"] {
-            padding: 10px;
+            padding: 10px 20px;
             margin: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
+            width: 200px; /* Set fixed width for consistency */
         }
 
-        input[type="submit"] {
-            background-color: #4CAF50;
+        input[type="submit"], input[type="button"], .enter-button {
+            background-color: #007BFF;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            width: 200px; /* Set fixed width for all buttons */
+            text-align: center;
         }
 
-        input[type="submit"]:hover {
-            background-color: #45a049;
+        input[type="submit"]:hover, input[type="button"]:hover, .enter-button:hover {
+            background-color: #0056b3;
         }
 
         .container {
@@ -59,8 +62,8 @@
                 padding: 10px;
             }
 
-            input[type="text"], input[type="submit"] {
-                width: 100%;
+            input[type="text"], input[type="submit"], input[type="button"], .enter-button {
+                width: 100%; /* Makes buttons full-width on small screens */
                 margin: 5px 0;
             }
         }
@@ -84,7 +87,7 @@
 
         .enter-button {
             margin-left: 10px;
-            background-color: #4CAF50;
+            background-color: #007BFF;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s ease;
@@ -95,7 +98,7 @@
         }
 
         .enter-button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -106,7 +109,6 @@
         <!-- Form for Merchant Name input -->
         <form id="queryForm" action="/faq_reply" method="post">
             <div class="input-container">
-                <!-- Label for Merchant Name input -->
                 <label for="merchantName">What would you like to ask? :</label> <!-- Associates label with the input -->
                 <input type="text" id="merchantName" name="q" placeholder="Please ask your question:" required>
             </div>

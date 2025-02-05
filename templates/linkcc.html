@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Credit Cards for {{ user_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+        h1 {
+            color: #007BFF;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .message {
+            color: #007BFF;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: red;
+        }
+        .card-table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            border: 1px solid #ccc;
+        }
+        .card-table th, .card-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .card-table th {
+            background-color: #007BFF;
+            color: white;
+        }
+        .card-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .card-table tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <script type="text/javascript">
+        // Data for Singapore Credit Cards (Only Cashback and Miles)
+        const bankCards = {
+            "DBS Bank": {
+                "Cashback": ["DBS Live Fresh Cashback", "DBS Black World MasterCard", "DBS Woman's Card", "DBS Esso Cashback Card"],
+                "Miles": ["DBS Altitude Visa Signature", "DBS Altitude AMEX", "DBS World Miles Card"]
+            },
+            "OCBC Bank": {
+                "Cashback": ["OCBC 365 Credit Card", "OCBC Cash Back Card", "OCBC 365 Mastercard"],
+                "Miles": ["OCBC Voyage Card", "OCBC Titanium Rewards", "OCBC Premier World Mastercard"]
+            },
+            "UOB Bank": {
+                "Cashback": ["UOB One Card", "UOB Lady's Card", "UOB Uniquely U Card", "UOB Absolute Cashback Card"],
+                "Miles": ["UOB PRVI Miles Card", "UOB PRVI Miles World MasterCard", "UOB KrisFlyer Miles Card"]
+            },
+            "Standard Chartered": {
+                "Cashback": ["Standard Chartered Unlimited Cashback", "Standard Chartered Cash Back Card", "Standard Chartered Smart Credit Card"],
+                "Miles": ["Standard Chartered Priority Banking Card", "Standard Chartered Asia Miles Card"]
+            },
+            "Citibank": {
+                "Cashback": ["Citi Cash Back Card", "Citi Cash Back World Card", "Citi Dividend Card"],
+                "Miles": ["Citi PremierMiles Card", "Citi PremierMiles World Mastercard", "Citi Rewards Card"]
+            },
+            "HSBC": {
+                "Cashback": ["HSBC Revolution Credit Card", "HSBC Advance Credit Card", "HSBC Visa Cash Back Card"],
+                "Miles": ["HSBC Visa Infinite Card", "HSBC PremierMiles Card", "HSBC Gold Visa Card"]
+            },
+            "Maybank": {
+                "Cashback": ["Maybank Family & Friends Card", "Maybank eVibes Card", "Maybank 2 Cards Gold Card"],
+                "Miles": ["Maybank Horizon Platinum MasterCard", "Maybank SkyLink Miles Card"]
+            },
+            "Bank of China": {
+                "Cashback": ["Bank of China WeChat Pay Card", "Bank of China e-Cashback MasterCard"],
+                "Miles": ["BOC Travel World MasterCard", "BOC Visa Infinite Card"]
+            }
+        };
+
+        const cardTypes = ["Cashback", "Miles"];
+
+        function updateBanks() {
+            const cardTypeSelect = document.getElementById("cardTypeSelect");
+            const bankSelect = document.getElementById("bankSelect");
+            const selectedCardType = cardTypeSelect.value;
+
+            // Clear existing banks and credit cards
+            bankSelect.innerHTML = "<option value=''>Select a Bank</option>";
+            document.getElementById("creditCardSelect").innerHTML = "<option value=''>Select a Credit Card</option>";
+
+            // Populate banks based on selected card type
+            if (selectedCardType) {
+                const banks = Object.keys(bankCards);
+                banks.forEach(bank => {
+                    const option = document.createElement("option");
+                    option.value = bank;
+                    option.textContent = bank;
+                    bankSelect.appendChild(option);
+                });
+            }
+        }
+
+        function updateCreditCards() {
+            const bankSelect = document.getElementById("bankSelect");
+            const cardTypeSelect = document.getElementById("cardTypeSelect");
+            const creditCardSelect = document.getElementById("creditCardSelect");
+
+            const selectedBank = bankSelect.value;
+            const selectedCardType = cardTypeSelect.value;
+
+            // Clear existing credit card options
+            creditCardSelect.innerHTML = "<option value=''>Select a Credit Card</option>";
+
+            if (selectedBank && selectedCardType) {
+                const cards = bankCards[selectedBank][selectedCardType];
+                cards.forEach(card => {
+                    const option = document.createElement("option");
+                    option.value = card;
+                    option.textContent = card;
+                    creditCardSelect.appendChild(option);
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>Credit Card Selection for {{ user_name }}</h1>
+    
+     <!-- Display success message if applicable -->
+     {% if message %}
+        <div class="message {% if 'already' in message %}error{% endif %}">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <form action="/linkcc" method="POST">
+        <!-- Card Type -->
+        <div class="form-group">
+            <label for="cardTypeSelect">Select Credit Card Type:</label>
+            <select id="cardTypeSelect" name="cardType" onchange="updateBanks()">
+                <option value="">Select Card Type</option>
+                <option value="Cashback">Cashback</option>
+                <option value="Miles">Miles</option>
+            </select>
+        </div>
+
+        <!-- Bank Selection -->
+        <div class="form-group">
+            <label for="bankSelect">Select Bank:</label>
+            <select id="bankSelect" name="bank" onchange="updateCreditCards()">
+                <option value="">Select a Bank</option>
+            </select>
+        </div>
+
+        <!-- Credit Card Selection -->
+        <div class="form-group">
+            <label for="creditCardSelect">Select Credit Card:</label>
+            <select id="creditCardSelect" name="creditCard">
+                <option value="">Select a Credit Card</option>
+            </select>
+        </div>
+
+         <!-- Submit Button -->
+         <button type="submit">Submit</button>
+         <!-- Return Button -->
+         <a href="/main" class="return-button">
+             <button type="button">Return</button>
+         </a>
+     </form>
+ 
+     <!-- Table of User's Existing Cards -->
+     <h2>Existing Credit Cards</h2>
+     <table class="card-table">
+         <thead>
+             <tr>
+                 <th>Bank</th>
+                 <th>Credit Card</th>
+                 <th>Date Added</th>
+             </tr>
+         </thead>
+         <tbody>
+             {% for card in user_cards %}
+             <tr>
+                <td>{{ card[0] }}</td>
+                <td>{{ card[1] }}</td>
+                <td>{{ card[2] }}</td>
+             </tr>
+             {% endfor %}
+         </tbody>
+     </table>
+</body>
+</html>

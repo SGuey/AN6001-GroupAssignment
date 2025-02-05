@@ -1,21 +1,28 @@
 import sqlite3
+import pandas as pd
+username = "asd"  # Example username
 
-# Connect to the SQLite database (it will create the database file if it doesn't exist)
+# Connect to SQLite database
 conn = sqlite3.connect('database.db')
-c = conn.cursor()
 
-# Create the user table with required columns (id, name, and timestamp)
-c.execute('''
-    CREATE TABLE IF NOT EXISTS user (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NULL,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-''')
+# Read data into a Pandas DataFrame
+query = "SELECT * FROM user_cc WHERE name = ?"
+df = pd.read_sql_query(query, conn, params=(username,))
 
-# Commit the changes and close the connection
-conn.commit()
-c.close()
+# Close the connection
 conn.close()
 
-print("Table 'user' created successfully.")
+# Display as a table
+print(df)
+
+conn = sqlite3.connect('database.db')
+
+# Read data into a Pandas DataFrame
+query = "SELECT * FROM user_cc"
+df = pd.read_sql_query(query, conn, params=())
+
+# Close the connection
+conn.close()
+
+# Display as a table
+print(df)

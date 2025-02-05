@@ -31,16 +31,15 @@
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
-            background-color: #4CAF50;
+            background-color: #007BFF;
             color: white;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
         input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
-
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -79,14 +78,14 @@
         <form action="/main" method="post">
             <input type="submit" value="Credit Card Approval Predictor">
         </form>
-        <form action="/main" method="post">
+        <form action="/linkcc" method="post">
             <input type="submit" value="Link Credit Cards">
         </form>
-        <form action="/retrieve_db" method="post">
-            <input type="submit" value="View Users Log">
+        <form action="/retrieve_userlog" method="post">
+            <input type="submit" value="View Users Login Logs">
         </form>
-        <form action="/delete_db" method="post">
-            <input type="submit" value="Clear Users Log">
+        <form action="/delete_userlog" method="post">
+            <input type="submit" value="Clear Users Login Logs">
         </form>
         <form action="/" method="post">
             <input type="submit" value="End">
