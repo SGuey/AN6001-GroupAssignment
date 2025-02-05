@@ -9,7 +9,7 @@ import sqlite3
 from datetime import datetime
 
 # Set OpenAI API key
-openai.api_key = "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"
+#openai.api_key = "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"
 
 app = Flask(__name__)
 user_name = ""
