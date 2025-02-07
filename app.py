@@ -7,6 +7,7 @@ import numpy as np
 import textblob
 import sqlite3
 from datetime import datetime
+import joblib
 
 # Set OpenAI API key
 #openai.api_key = "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"
@@ -216,6 +217,39 @@ def miles_reply():
     response_text = generate_gpt_response(prompt)
     user_cards = get_user_all_credit_cards_With_types(user_name,'Miles')
     return render_template("gpt_reply.html", r=response_text, user_cards=user_cards, type = 'Miles')
+
+def preprocess_input(data):
+    """Preprocess input data to match training format."""
+    data_array = np.array(data, dtype=float).reshape(1, -1)
+
+    scaler = joblib.load("scaler.pkl")  # Ensure the scaler is also saved and loaded
+
+    return scaler.transform(data_array)
+
+@app.route('/prediction', methods=['GET', 'POST'])
+def prediction():
+    prediction = None
+    if request.method == 'POST':
+        try:
+            # Extract user inputs
+            features = [
+                request.form['Male'], request.form['Age'], request.form['Debt'], request.form['Married'],
+                request.form['BankCustomer'], request.form['EducationLevel'],
+                request.form['YearsEmployed'], request.form['PriorDefault'], request.form['Employed'],
+                request.form['CreditScore'], request.form['Citizen'],
+                request.form['Income']
+            ]
+            processed_features = preprocess_input(features)
+            # Load the trained model
+            model = joblib.load("model.pkl")
+            
+            result = model.predict(processed_features)
+            prediction = "Approved" if result[0] == 1 else "Denied"
+        except Exception as e:
+            prediction = f"Error: {str(e)}"
+    
+    return render_template('prediction.html', prediction=prediction)
+
 
 if __name__ == "__main__":
     init_db()
