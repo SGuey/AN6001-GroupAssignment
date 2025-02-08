@@ -3,4 +3,4 @@ flask
 numpy
 textblob
 openai==0.28
-sklearn
+scikit-learn
