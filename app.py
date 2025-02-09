@@ -122,6 +122,38 @@ def linkcc():
 
     return render_template('linkcc.html', user_name=user_name, user_cards=user_cards)
 
+@app.route("/removecc", methods=["POST"])
+def removecc():
+    message = ""
+    
+    cc_name = request.form.get('cc_name')
+    
+    print (cc_name)
+    if cc_name:
+        try:
+            # Connect to the database and remove the selected credit card
+            conn = sqlite3.connect('database.db')
+            c = conn.cursor()
+            
+            # Delete the credit card with the given card_name
+            c.execute('''DELETE FROM user_cc WHERE cc_name = ? AND name = ?''', (cc_name, user_name))
+            conn.commit()
+            
+            message = "Credit card removed successfully."
+            
+            # Fetch the updated list of credit cards for this user
+            user_cards = get_user_all_credit_cards(user_name)
+            
+            conn.close()
+            return render_template('linkcc.html', user_name=user_name, message=message, user_cards=user_cards)
+        except Exception as e:
+            message = f"Error: {e}"
+    
+    # If no card was selected for removal, simply render the page
+    user_cards = get_user_all_credit_cards(user_name)
+    return render_template('linkcc.html', user_name=user_name, message=message, user_cards=user_cards)
+
+
 def generate_gpt_response(prompt):
     # Request the GPT model for a response
     r = openai.ChatCompletion.create(

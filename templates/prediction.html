@@ -45,7 +45,6 @@
             cursor: pointer;
             font-size: 16px;
             margin-top: 20px;
-            width: 100%;
         }
         button:hover {
             background-color: #0056b3;
@@ -210,7 +209,10 @@
 
         <!-- Submit Button -->
         <button type="submit">Predict</button>
-
+        <!-- Return Button -->
+        <a href="/main" class="return-button">
+            <button type="button">Return</button>
+        </a>
         <script>
             function formatNumber(outputId, value) {
                 document.getElementById(outputId).textContent = parseInt(value).toLocaleString();

@@ -81,7 +81,9 @@
         .card-table tr:hover {
             background-color: #f1f1f1;
         }
+        
     </style>
+
     <script type="text/javascript">
         // Data for Singapore Credit Cards (Only Cashback and Miles)
         const bankCards = {
@@ -219,6 +221,7 @@
                  <th>Bank</th>
                  <th>Credit Card</th>
                  <th>Date Added</th>
+                 <th>Actions</th>
              </tr>
          </thead>
          <tbody>
@@ -227,6 +230,13 @@
                 <td>{{ card[0] }}</td>
                 <td>{{ card[1] }}</td>
                 <td>{{ card[2] }}</td>
+                <td>
+                    <!-- Form to Remove the Selected Card -->
+                    <form action="/removecc" method="POST" style="display:inline;">
+                        <input type="hidden" name="cc_name" value="{{ card[1] }}"> <!-- Assuming card[3] is the unique ID for each card -->
+                        <button type="submit" class="remove-button">Remove</button>
+                    </form>
+                </td>
              </tr>
              {% endfor %}
          </tbody>
