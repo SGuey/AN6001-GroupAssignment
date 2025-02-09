@@ -218,6 +218,7 @@ def miles_reply():
     user_cards = get_user_all_credit_cards_With_types(user_name,'Miles')
     return render_template("gpt_reply.html", r=response_text, user_cards=user_cards, type = 'Miles')
 
+
 def preprocess_input(data):
     """Preprocess input data to match training format."""
     data_array = np.array(data, dtype=float).reshape(1, -1)
@@ -229,26 +230,43 @@ def preprocess_input(data):
 @app.route('/prediction', methods=['GET', 'POST'])
 def prediction():
     prediction = None
+    user_inputs = {}
+
     if request.method == 'POST':
-        try:
-            # Extract user inputs
-            features = [
-                request.form['Male'], request.form['Age'], request.form['Debt'], request.form['Married'],
-                request.form['BankCustomer'], request.form['EducationLevel'],
-                request.form['YearsEmployed'], request.form['PriorDefault'], request.form['Employed'],
-                request.form['CreditScore'], request.form['Citizen'],
-                request.form['Income']
-            ]
-            processed_features = preprocess_input(features)
-            # Load the trained model
-            model = joblib.load("model.pkl")
-            
-            result = model.predict(processed_features)
-            prediction = "Approved" if result[0] == 1 else "Denied"
-        except Exception as e:
-            prediction = f"Error: {str(e)}"
+        if not request.form:  # Check if the form is empty
+            prediction = "Please fill in the values"
+        else:
+            try:
+                # Extract user inputs
+                user_inputs = {
+                    'Male': str(request.form['Male']),  # Assuming Male is 0 or 1 (int)
+                    'Age': str(request.form['Age']),  # Assuming Age is an integer
+                    'Debt': str(request.form['Debt']),  # Assuming Debt is an integer
+                    'Married': str(request.form['Married']),  # Assuming Married is 0 or 1 (int)
+                    'BankCustomer': str(request.form['BankCustomer']),  # Assuming BankCustomer is 0 or 1 (int)
+                    'EducationLevel': str(request.form['EducationLevel']),  # Assuming EducationLevel is an integer
+                    'YearsEmployed': str(request.form['YearsEmployed']),  # Assuming YearsEmployed is an integer
+                    'PriorDefault': str(request.form['PriorDefault']),  # Assuming PriorDefault is 0 or 1 (int)
+                    'Employed': str(request.form['Employed']),  # Assuming Employed is 0 or 1 (int)
+                    'CreditScore': str(request.form['CreditScore']),  # Assuming CreditScore is an integer
+                    'Citizen': str(request.form['Citizen']),  # Assuming Citizen is 0 or 1 (int)
+                    'Income': str(request.form['Income'])  # Assuming Income is an integer
+                }
+                print(list(user_inputs.values()))
+                processed_features = preprocess_input(list(user_inputs.values()))
+                print(f"Processed features: {processed_features}")
+                # Load the trained model
+                model = joblib.load("model.pkl")
+
+                result = model.predict(processed_features)
+                print(result)
+                prediction = "Approved" if result[0] == 1 else "Denied"
+            except Exception as e:
+                prediction = f"Error: {str(e)}"
+                print(prediction)
     
-    return render_template('prediction.html', prediction=prediction)
+    return render_template('prediction.html', prediction=prediction, user_inputs=user_inputs)
+
 
 
 if __name__ == "__main__":
