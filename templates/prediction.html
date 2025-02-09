@@ -1,52 +1,237 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Card Approval Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+        h2 {
+            color: #007BFF;
+            text-align: center;
+        }
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: auto;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        select, input[type="text"], input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .message {
+            color: #007BFF;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .error {
+            color: red;
+        }
+        .form-section {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .section-box {
+            flex: 1;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .section-title {
+            text-align: center;
+            font-weight: bold;
+            color: #007BFF;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
+
     <h2>Credit Card Approval Prediction</h2>
+
     <form method="post">
-        <label>Male (1 = Yes, 0 = No):</label>
-        <input type="text" name="Male" required><br>
-        
-        <label>Age:</label>
-        <input type="text" name="Age" required><br>
-        
-        <label>Debt (monthly $):</label>
-        <input type="text" name="Debt" required><br>
-        
-        <label>Married (1 = Yes, 0 = No):</label>
-        <input type="text" name="Married" required><br>
-        
-        <label>Bank Customer (1 = Yes, 0 = No):</label>
-        <input type="text" name="BankCustomer" required><br>
-        
-        <label>Education Level (0-14 years):</label>
-        <input type="text" name="EducationLevel" required><br>
-        
-        <label>Years Employed:</label>
-        <input type="text" name="YearsEmployed" required><br>
-        
-        <label>Prior default history (1 = Yes, 0 = No):</label>
-        <input type="text" name="PriorDefault" required><br>
-        
-        <label>Employment status (1 = Yes, 0 = No):</label>
-        <input type="text" name="Employed" required><br>
-        
-        <label>Credit Score (1-10):</label>
-        <input type="text" name="CreditScore" required><br>
-        
-        <label>Citizen (1 = Yes, 0 = No):</label>
-        <input type="text" name="Citizen" required><br>
-        
-        <label>Income (monthly $):</label>
-        <input type="text" name="Income" required><br>
-        
-        <input type="submit" value="Predict">
+        <!-- Row Layout for Sections -->
+        <div class="form-section">
+            
+            <!-- Personal Information Section -->
+            <div class="section-box">
+                <h3 class="section-title">Personal Information</h3>
+
+                <div class="form-group">
+                    <label for="Male">Gender:</label>
+                    <select id="Male" name="Male" required>
+                        <option value="" {% if user_inputs.get('Male') is none %}selected{% endif %}>Select</option>
+                        <option value="1" {% if user_inputs.get('Male') == '1' %}selected{% endif %}>Male</option>
+                        <option value="0" {% if user_inputs.get('Male') == '0' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Age">Age:</label>
+                    <input type="text" id="Age" name="Age" required pattern="\d+" title="Enter a valid number"
+                           value="{{ user_inputs.get('Age', '') }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="Married">Marital Status:</label>
+                    <select id="Married" name="Married" required>
+                        <option value="">Select</option>
+                        <option value="1" {% if user_inputs.get('Married') == '1' %}selected{% endif %}>Married</option>
+                        <option value="0" {% if user_inputs.get('Married') == '0' %}selected{% endif %}>Single</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Citizen">Citizen Status:</label>
+                    <select id="Citizen" name="Citizen" required>
+                        <option value="">Select</option>
+                        <option value="1" {% if user_inputs.get('Citizen') == '1' %}selected{% endif %}>Singapore Citizen / PR</option>
+                        <option value="0" {% if user_inputs.get('Citizen') == '0' %}selected{% endif %}>Foreigner</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Education & Employment Section -->
+            <div class="section-box">
+                <h3 class="section-title">Education & Employment</h3>
+
+                <div class="form-group">
+                    <label for="EducationLevel">Education Level:</label>
+                    <select id="EducationLevel" name="EducationLevel" required>
+                        <option value="">Select</option>
+                        <option value="6" {% if user_inputs.get('EducationLevel') == '6' %}selected{% endif %}>Primary School (6 years)</option>
+                        <option value="12" {% if user_inputs.get('EducationLevel') == '12' %}selected{% endif %}>Secondary School (12 years)</option>
+                        <option value="14" {% if user_inputs.get('EducationLevel') == '14' %}selected{% endif %}>Associate's Degree (14 years)</option>
+                        <option value="16" {% if user_inputs.get('EducationLevel') == '16' %}selected{% endif %}>Bachelor’s Degree (16 years)</option>
+                        <option value="18" {% if user_inputs.get('EducationLevel') == '18' %}selected{% endif %}>Master’s Degree (18 years)</option>
+                        <option value="21" {% if user_inputs.get('EducationLevel') == '21' %}selected{% endif %}>Doctorate (PhD) (21 years)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="Employed">Employment Status:</label>
+                    <select id="Employed" name="Employed" required>
+                        <option value="">Select</option>
+                        <option value="1" {% if user_inputs.get('Employed') == '1' %}selected{% endif %}>Employed</option>
+                        <option value="0" {% if user_inputs.get('Employed') == '0' %}selected{% endif %}>Not Employed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="YearsEmployed">Years Employed:</label>
+                    <input type="range" id="YearsEmployed" name="YearsEmployed" min="0" max="50" step="1"
+                           oninput="formatNumber('YearsEmployed', this.value)" 
+                           value="{{ user_inputs.get('YearsEmployed', '1') }}">
+                    <output id="YearsEmployed">{{ "{:,}".format(user_inputs.get('YearsEmployed', 1) | int) }}</output>
+                </div>              
+
+                <div class="form-group">
+                    <label for="Income">Income (monthly $):</label>
+                    <input type="range" id="Income" name="Income" min="0" max="100000" step="100"
+                           oninput="formatNumber('incomeOutput', this.value)" 
+                           value="{{ user_inputs.get('Income', '5000') }}">
+                    <output id="incomeOutput">{{ "{:,}".format(user_inputs.get('Income', 5000) | int) }}</output>
+                </div>
+            </div>
+
+            <!-- Finance Section -->
+            <div class="section-box">
+                <h3 class="section-title">Finance</h3>
+
+                <div class="form-group">
+                    <label for="Debt">Debt (monthly $):</label>
+                    <input type="range" id="Debt" name="Debt" min="0" max="100000" step="100"
+                           oninput="formatNumber('debtOutput', this.value)" 
+                           value="{{ user_inputs.get('Debt', '0') }}">
+                    <output id="debtOutput">{{ "{:,}".format(user_inputs.get('Debt', 0) | int) }}</output>
+                </div>
+
+                <div class="form-group">
+                    <label for="BankCustomer">Currently is Bank Customer?:</label>
+                    <select id="BankCustomer" name="BankCustomer" required>
+                        <option value="">Select</option>
+                        <option value="1" {% if user_inputs.get('BankCustomer') == '1' %}selected{% endif %}>Yes</option>
+                        <option value="0" {% if user_inputs.get('BankCustomer') == '0' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="PriorDefault">Prior Default:</label>
+                    <select id="PriorDefault" name="PriorDefault" required>
+                        <option value="">Select</option>
+                        <option value="1" {% if user_inputs.get('PriorDefault') == '1' %}selected{% endif %}>Yes</option>
+                        <option value="0" {% if user_inputs.get('PriorDefault') == '0' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="CreditScore">Credit Score (1-10):</label>
+                    <input type="range" id="CreditScore" name="CreditScore" min="1" max="10" step="1" oninput="creditOutput.value = CreditScore.value"
+                           value="{{ user_inputs.get('CreditScore', '5') }}">
+                    <output id="creditOutput">5</output>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit">Predict</button>
+
+        <script>
+            function formatNumber(outputId, value) {
+                document.getElementById(outputId).textContent = parseInt(value).toLocaleString();
+            }
+
+            // Initialize outputs with formatted values on page load
+            window.onload = function() {
+                document.getElementById("incomeOutput").textContent = 
+                    parseInt(document.getElementById("Income").value).toLocaleString();
+                document.getElementById("debtOutput").textContent = 
+                    parseInt(document.getElementById("Debt").value).toLocaleString();
+            };
+            document.getElementById("creditOutput").value = document.getElementById("CreditScore").value;
+        </script>
     </form>
-    
-    {% if prediction %}
-        <h3>Prediction: {{ prediction }}</h3>
+
+    {% if prediction is not none %}
+        <h3 class="message">Prediction: {{ prediction }}</h3>
     {% endif %}
+
 </body>
 </html>

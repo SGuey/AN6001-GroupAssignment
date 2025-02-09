@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Credit Card Approval Prediction</title>
+</head>
+<body>
+    <h2>Credit Card Approval Prediction</h2>
+    <form method="post">
+        <label>Male (1 = Yes, 0 = No):</label>
+        <input type="text" name="Male" required><br>
+        
+        <label>Age:</label>
+        <input type="text" name="Age" required><br>
+        
+        <label>Debt (monthly $):</label>
+        <input type="text" name="Debt" required><br>
+        
+        <label>Married (1 = Yes, 0 = No):</label>
+        <input type="text" name="Married" required><br>
+        
+        <label>Bank Customer (1 = Yes, 0 = No):</label>
+        <input type="text" name="BankCustomer" required><br>
+        
+        <label>Education Level (0-14 years):</label>
+        <input type="text" name="EducationLevel" required><br>
+        
+        <label>Years Employed:</label>
+        <input type="text" name="YearsEmployed" required><br>
+        
+        <label>Prior default history (1 = Yes, 0 = No):</label>
+        <input type="text" name="PriorDefault" required><br>
+        
+        <label>Employment status (1 = Yes, 0 = No):</label>
+        <input type="text" name="Employed" required><br>
+        
+        <label>Credit Score (1-10):</label>
+        <input type="text" name="CreditScore" required><br>
+        
+        <label>Citizen (1 = Yes, 0 = No):</label>
+        <input type="text" name="Citizen" required><br>
+        
+        <label>Income (monthly $):</label>
+        <input type="text" name="Income" required><br>
+        
+        <input type="submit" value="Predict">
+    </form>
+    
+    {% if prediction %}
+        <h3>Prediction: {{ prediction }}</h3>
+    {% endif %}
+</body>
+</html>

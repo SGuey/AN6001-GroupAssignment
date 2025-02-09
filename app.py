@@ -229,6 +229,7 @@ def preprocess_input(data):
 @app.route('/prediction', methods=['GET', 'POST'])
 def prediction():
     prediction = None
+    user_inputs = {}
     if request.method == 'POST':
         try:
             # Extract user inputs
@@ -248,7 +249,7 @@ def prediction():
         except Exception as e:
             prediction = f"Error: {str(e)}"
     
-    return render_template('prediction.html', prediction=prediction)
+    return render_template('prediction.html', prediction=prediction, user_inputs=user_inputs)
 
 
 if __name__ == "__main__":
