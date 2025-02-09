@@ -138,10 +138,7 @@
                         <option value="">Select</option>
                         <option value="6" {% if user_inputs.get('EducationLevel') == '6' %}selected{% endif %}>Primary School (6 years)</option>
                         <option value="12" {% if user_inputs.get('EducationLevel') == '12' %}selected{% endif %}>Secondary School (12 years)</option>
-                        <option value="14" {% if user_inputs.get('EducationLevel') == '14' %}selected{% endif %}>Associate's Degree (14 years)</option>
-                        <option value="16" {% if user_inputs.get('EducationLevel') == '16' %}selected{% endif %}>Bachelor’s Degree (16 years)</option>
-                        <option value="18" {% if user_inputs.get('EducationLevel') == '18' %}selected{% endif %}>Master’s Degree (18 years)</option>
-                        <option value="21" {% if user_inputs.get('EducationLevel') == '21' %}selected{% endif %}>Doctorate (PhD) (21 years)</option>
+                        <option value="14" {% if user_inputs.get('EducationLevel') == '14' %}selected{% endif %}>Diploma or higher (14 years)</option>
                     </select>
                 </div>
 
@@ -156,15 +153,16 @@
 
                 <div class="form-group">
                     <label for="YearsEmployed">Years Employed:</label>
-                    <input type="range" id="YearsEmployed" name="YearsEmployed" min="0" max="50" step="1"
-                           oninput="formatNumber('YearsEmployed', this.value)" 
+                    <input type="range" id="YearsEmployed" name="YearsEmployed" min="0" max="30" step="1"
+                           oninput="document.getElementById('YearsEmployedOutput').value = YearsEmployed.value" 
                            value="{{ user_inputs.get('YearsEmployed', '1') }}">
-                    <output id="YearsEmployed">{{ "{:,}".format(user_inputs.get('YearsEmployed', 1) | int) }}</output>
-                </div>              
-
+                    <output id="YearsEmployedOutput">{{ user_inputs.get('YearsEmployed', '1') }}</output>
+                </div>
+                             
+                
                 <div class="form-group">
-                    <label for="Income">Income (monthly $):</label>
-                    <input type="range" id="Income" name="Income" min="0" max="100000" step="100"
+                    <label for="Income">Income (Monthly S$):</label>
+                    <input type="range" id="Income" name="Income" min="0" max="20000" step="100"
                            oninput="formatNumber('incomeOutput', this.value)" 
                            value="{{ user_inputs.get('Income', '5000') }}">
                     <output id="incomeOutput">{{ "{:,}".format(user_inputs.get('Income', 5000) | int) }}</output>
@@ -176,8 +174,8 @@
                 <h3 class="section-title">Finance</h3>
 
                 <div class="form-group">
-                    <label for="Debt">Debt (monthly $):</label>
-                    <input type="range" id="Debt" name="Debt" min="0" max="100000" step="100"
+                    <label for="Debt">Debt (Monthly S$):</label>
+                    <input type="range" id="Debt" name="Debt" min="0" max="20000" step="100"
                            oninput="formatNumber('debtOutput', this.value)" 
                            value="{{ user_inputs.get('Debt', '0') }}">
                     <output id="debtOutput">{{ "{:,}".format(user_inputs.get('Debt', 0) | int) }}</output>
@@ -202,7 +200,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="CreditScore">Credit Score (1-10):</label>
+                    <label for="CreditScore">Credit Score (1-10)(Good - Bad):</label>
                     <input type="range" id="CreditScore" name="CreditScore" min="1" max="10" step="1" oninput="creditOutput.value = CreditScore.value"
                            value="{{ user_inputs.get('CreditScore', '5') }}">
                     <output id="creditOutput">5</output>
