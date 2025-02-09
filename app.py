@@ -127,6 +127,7 @@ def removecc():
     message = ""
     
     cc_name = request.form.get('cc_name')
+    
     print (cc_name)
     if cc_name:
         try:
