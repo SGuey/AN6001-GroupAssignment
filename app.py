@@ -222,7 +222,7 @@ def cashback_reply():
         
     # Building the prompt based on whether the user opted in to use their credit cards
     if user_cc:
-        prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and Use the following credit cards for the suggestion: {user_cc}. Show the cashback %. Don't need to return a conclusion."
+        prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and Use the following credit cards for the suggestion: {user_cc}. Order the credit card suggestions by highest cashback rate and show the cashback %. Don't need to return a conclusion."
     else:
         prompt = f"Please state the 4 digit Singapore Credit card MCC Code for {q} and return suggested Singapore Cashback Credit card with cashback % for {q}. Order the credit card suggestions by highest cashback rate. Don't need to return a conclusion."
 
